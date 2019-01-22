@@ -1,0 +1,105 @@
+---
+title: "Practicals GWAS"
+author: "Sodbo Sharapov"
+date: "January 22, 2019"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Outline of the practicals
+
+The practical session consists of XXX steps:
+
+ 1. Exploring phenotype data
+ 2. Exploring genotype data
+ 3. Quality control of genotype data
+ 4. Association analysis and GWAS
+ 5. Vizualization of the results
+
+# Exploring phenotype data
+
+Load GenABEL package
+ 
+```{r}
+library(GenABEL)
+```
+
+Load phenotype and genotype data
+
+```{r}
+
+data("ge03d2")
+
+
+```
+
+Let's get the Structure of ge03d2 object
+
+```{r}
+str(ge03d2)
+```
+
+Let's save phenotype data into separate object named *pheno*.
+And look at the first rows of the *pheno* object
+
+```{r}
+
+pheno <- phdata(ge03d2)
+
+head(pheno)
+```
+
+Description of the columns:
+
+  1. ID: id code of sample 
+  2. sex: sex, '0' is female, '1' is male
+  3. age: age, in years
+  4. dm2: diabetes mellitus type 2, '0' is unaffected, '1' is affected
+  5. height: height, in cm
+  6. wieght: wieght, in kg
+  7. diet: following the diet, '0' is false, '1' is true
+  8. bmi: BMI, body mass index, in $cm/kg^2$
+
+Now let's have a look at the summary of the phenotype data
+
+```{r}
+summary(pheno)
+```
+
+For the categorial traits **table** function can be applied to get summary of the trait.
+
+```{r}
+table(pheno$sex)
+table(pheno$dm2)
+table(pheno$diet)
+```
+
+You can plot a historgram for quantitaive traits
+
+```{r}
+hist(pheno$age, main='Histogram of age', xlab = 'Age')
+hist(pheno$height, main='Histogram of height', xlab = 'Height')
+hist(pheno$weight, main='Histogram of weight', xlab = 'Weight')
+hist(pheno$bmi, main='Histogram of bmi', xlab = 'BMI')
+```
+
+It is important to check whether your trait of interest is correlated with covariates.
+To eheck this you can estimate the Peasron correlation coefficient and/or perform linear regression analysis.
+First, let's examine the correlation structure for phenotype data
+```{r}
+cor_matrix <- cor(pheno[,c('dm2','sex','age','height','weight','bmi','diet')], use='complete.obs')
+
+cor_matrix
+```
+Now let's vizualize correlation matrix using *corplot* package
+
+```{r}
+library(corrplot)
+
+corrplot(cor_matrix)
+```
+
+Heatmap clearly shows that dm2 is correlated with weight and bmi
