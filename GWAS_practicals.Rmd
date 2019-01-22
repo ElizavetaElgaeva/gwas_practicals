@@ -1,8 +1,10 @@
-# ---
+---
 title: "Practicals GWAS"
 author: "Sodbo Sharapov"
 date: "January 22, 2019"
-output: github_document
+output:
+  html_document: 
+    keep_md: true
 ---
 
 ```{r setup, include=FALSE}
