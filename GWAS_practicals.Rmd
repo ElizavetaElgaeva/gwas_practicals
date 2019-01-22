@@ -1,4 +1,4 @@
----
+# ---
 title: "Practicals GWAS"
 author: "Sodbo Sharapov"
 date: "January 22, 2019"
@@ -102,4 +102,27 @@ library(corrplot)
 corrplot(cor_matrix)
 ```
 
-Heatmap clearly shows that dm2 is correlated with weight and bmi
+Heatmap clearly shows that dm2 is correlated with weight and bmi.
+Let's run logistic regression for dm2 vs weight
+
+```{r}
+dm2_weight <- glm(dm2~weight,data = pheno,family = 'binomial')
+summary(dm2_weight)
+```
+
+
+```{r}
+dm2_bmi <- glm(dm2~bmi,data = pheno,family = 'binomial')
+summary(dm2_bmi)
+```
+
+```{r}
+dm2_sex <- glm(dm2~sex,data = pheno,family = 'binomial')
+summary(dm2_sex)
+```
+
+betaOR for sex is 0.4465, that corresponds to `OR=exp(0.4465)=1.563`, which concordant with that, calculated from 2x2 table:
+```{r}
+table(pheno$dm2,pheno$sex)
+275*253/210/212
+```
