@@ -13,7 +13,7 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Outline of the practicals
 
-The practical session consists of XXX steps:
+The practical session consists of 5 steps:
 
  1. Exploring phenotype data
  2. Exploring genotype data
