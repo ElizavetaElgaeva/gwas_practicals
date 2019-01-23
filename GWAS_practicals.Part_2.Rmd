@@ -44,9 +44,14 @@ Let's get the Structure of ge03d2 object
 str(ge03d2)
 ```
 
-## Summary of genotype data
+Genotypes are stored as a huge N x M table, where N is number of IDs and M is a number of SNPs.
 
-Let's have a look at the summary of the genotype data.
+```{r}
+
+as.numeric(gtdata(ge03d2[1:5,1:5]))
+
+as.character(gtdata(ge03d2[1:5,1:5]))
+```
 
 How many IDs and SNPs do we have in our data?
 
@@ -90,9 +95,9 @@ Let's estiamte effective allele frequency for this SNP using different ways
 
 ```{r}
 
-(snp_info['rs6212914','P.12'] + snp_info['rs6212914','P.22'] * 2) / snp_info['rs6212914','NoMeasured']
+(snp_info['rs6212914','P.12'] + snp_info['rs6212914','P.22'] * 2) / snp_info['rs6212914','NoMeasured'] / 2
 
-mean(as.numeric(gtdata(ge03d2[,'rs6212914'])), na.rm=TRUE)
+mean(as.numeric(gtdata(ge03d2[,'rs6212914'])), na.rm=TRUE) / 2
 
 ```
 Let's perform HWE test for this SNP
@@ -100,3 +105,40 @@ Let's perform HWE test for this SNP
 ```{r}
 HWE.show(ge03d2[,'rs6212914'])
 ```
+
+## Per-SNP Summary of genotype data
+
+Let's have a look at the summary of the genotype data.
+
+First, let's add EAF (effective allele frequency) column to the *snp_info* object
+
+```{r}
+
+snp_info$EAF <- (snp_info[,'P.12'] + snp_info[,'P.22'] * 2) / snp_info[,'NoMeasured'] / 2
+
+head(snp_info)
+
+```
+
+Let's look at the distribution of EAF - effective allele frequency.
+
+```{r}
+hist(snp_info$EAF, breaks=50)
+```
+
+There are a lot of SNPs with EAF below 0.05 and above 0.95.
+
+What about call rate?
+
+```{r}
+hist(snp_info$CallRate, breaks=50)
+```
+
+What is the distribution of number of SNPs per chromosome?
+```{r}
+
+table(chromosome(ge03d2))
+```
+
+## Per-ID Summary of genotype data
+
