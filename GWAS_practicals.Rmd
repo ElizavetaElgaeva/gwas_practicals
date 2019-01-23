@@ -1,5 +1,5 @@
 ---
-title: "Practicals GWAS"
+title: "Practicals GWAS. Exploring phenotype data."
 author: "Sodbo Sharapov"
 date: "January 22, 2019"
 output:
@@ -21,7 +21,7 @@ The practical session consists of XXX steps:
  4. Association analysis and GWAS
  5. Vizualization of the results
 
-# Exploring phenotype data
+## Loading phenotype data
 
 Load GenABEL package
  
@@ -54,6 +54,8 @@ pheno <- phdata(ge03d2)
 head(pheno)
 ```
 
+## Summary of phenotype data
+
 Description of the columns:
 
   1. ID: id code of sample 
@@ -79,6 +81,8 @@ table(pheno$dm2)
 table(pheno$diet)
 ```
 
+## Distribution of traits
+
 You can plot a historgram for quantitaive traits
 
 ```{r}
@@ -87,6 +91,27 @@ hist(pheno$height, main='Histogram of height', xlab = 'Height')
 hist(pheno$weight, main='Histogram of weight', xlab = 'Weight')
 hist(pheno$bmi, main='Histogram of bmi', xlab = 'BMI')
 ```
+
+## Test for normality
+
+You can test whether the trait's discribution is normal or not using Shapiro test.
+
+```{r}
+shapiro.test(pheno$height)
+shapiro.test(pheno$weight)
+shapiro.test(pheno$bmi)
+```
+
+Distribution of BMI has left skewness. Log transformation can transform it to moreless normal
+
+```{r}
+hist(log(pheno$bmi), main='Histogram of logBMI', xlab = 'logBMI')
+shapiro.test(log(pheno$bmi))
+```
+
+
+
+## Correlation structure
 
 It is important to check whether your trait of interest is correlated with covariates.
 To eheck this you can estimate the Peasron correlation coefficient and/or perform linear regression analysis.
@@ -105,6 +130,9 @@ corrplot(cor_matrix)
 ```
 
 Heatmap clearly shows that dm2 is correlated with weight and bmi.
+
+## Logistic regression of outcome onto covariates
+
 Let's run logistic regression for dm2 vs weight
 
 ```{r}
@@ -123,7 +151,7 @@ dm2_sex <- glm(dm2~sex,data = pheno,family = 'binomial')
 summary(dm2_sex)
 ```
 
-betaOR for sex is 0.4465, that corresponds to `OR=exp(0.4465)=1.563`, which concordant with that, calculated from 2x2 table:
+betaOR for sex is 0.4465, that corresponds to `OR=exp(0.4465)=1.563`, which is concordant with that, calculated from 2x2 table:
 ```{r}
 table(pheno$dm2,pheno$sex)
 275*253/210/212

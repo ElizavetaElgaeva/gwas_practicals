@@ -1,5 +1,5 @@
 ---
-title: "Practicals GWAS"
+title: "Practicals GWAS. Exploring phenotype data."
 author: "Sodbo Sharapov"
 date: "January 22, 2019"
 output:
@@ -19,7 +19,7 @@ The practical session consists of XXX steps:
  4. Association analysis and GWAS
  5. Vizualization of the results
 
-# Exploring phenotype data
+## Loading phenotype data
 
 Load GenABEL package
  
@@ -101,6 +101,8 @@ head(pheno)
 ## id58 id58   0 37.00   1  165.1  89.54    0 32.85
 ```
 
+## Summary of phenotype data
+
 Description of the columns:
 
   1. ID: id code of sample 
@@ -171,6 +173,8 @@ table(pheno$diet)
 ## 908  42
 ```
 
+## Distribution of traits
+
 You can plot a historgram for quantitaive traits
 
 
@@ -197,6 +201,72 @@ hist(pheno$bmi, main='Histogram of bmi', xlab = 'BMI')
 ```
 
 ![](GWAS_practicals_files/figure-html/unnamed-chunk-7-4.png)<!-- -->
+
+## Test for normality
+
+You can test whether the trait's discribution is normal or not using Shapiro test.
+
+
+```r
+shapiro.test(pheno$height)
+```
+
+```
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  pheno$height
+## W = 1, p-value = 0.05
+```
+
+```r
+shapiro.test(pheno$weight)
+```
+
+```
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  pheno$weight
+## W = 0.95, p-value <2e-16
+```
+
+```r
+shapiro.test(pheno$bmi)
+```
+
+```
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  pheno$bmi
+## W = 0.93, p-value <2e-16
+```
+
+Distribution of BMI has left skewness. Log transformation can transform it to moreless normal
+
+
+```r
+hist(log(pheno$bmi), main='Histogram of logBMI', xlab = 'logBMI')
+```
+
+![](GWAS_practicals_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+
+```r
+shapiro.test(log(pheno$bmi))
+```
+
+```
+## 
+## 	Shapiro-Wilk normality test
+## 
+## data:  log(pheno$bmi)
+## W = 0.99, p-value = 3e-05
+```
+
+
+
+## Correlation structure
 
 It is important to check whether your trait of interest is correlated with covariates.
 To eheck this you can estimate the Peasron correlation coefficient and/or perform linear regression analysis.
@@ -233,9 +303,12 @@ library(corrplot)
 corrplot(cor_matrix)
 ```
 
-![](GWAS_practicals_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](GWAS_practicals_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
 
 Heatmap clearly shows that dm2 is correlated with weight and bmi.
+
+## Logistic regression of outcome onto covariates
+
 Let's run logistic regression for dm2 vs weight
 
 
@@ -328,7 +401,7 @@ summary(dm2_sex)
 ## Number of Fisher Scoring iterations: 3
 ```
 
-betaOR for sex is 0.4465, that corresponds to `OR=exp(0.4465)=1.563`, which concordant with that, calculated from 2x2 table:
+betaOR for sex is 0.4465, that corresponds to `OR=exp(0.4465)=1.563`, which is concordant with that, calculated from 2x2 table:
 
 ```r
 table(pheno$dm2,pheno$sex)
