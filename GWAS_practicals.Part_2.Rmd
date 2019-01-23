@@ -1,0 +1,56 @@
+---
+title: "Practicals GWAS. Exploring genotype data"
+author: "Sodbo Sharapov"
+date: "January 22, 2019"
+output:
+  html_document: 
+    keep_md: true
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+# Outline of the practicals
+
+The practical session consists of five steps:
+
+ 1. Exploring phenotype data
+ 2. Exploring genotype data
+ 3. Quality control of genotype data
+ 4. Association analysis and GWAS
+ 5. Vizualization of the results
+
+## Loading genotype data
+
+Load GenABEL package
+ 
+```{r}
+library(GenABEL)
+```
+
+Load phenotype and genotype data
+
+```{r}
+
+data("ge03d2")
+
+
+```
+
+Let's get the Structure of ge03d2 object
+
+```{r}
+str(ge03d2)
+```
+
+## Summary of genotype data
+
+Let's have a look at the summary of the genotype data.
+
+How many IDs and SNPs do we have in our data?
+
+```{r}
+nids(ge03d2)
+nsnps(ge03d2)
+```
