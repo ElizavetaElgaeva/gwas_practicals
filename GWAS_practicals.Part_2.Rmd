@@ -54,3 +54,49 @@ How many IDs and SNPs do we have in our data?
 nids(ge03d2)
 nsnps(ge03d2)
 ```
+
+What information about SNPs do we have?
+
+```{r}
+snp_info <- summary(gtdata(ge03d2))
+
+head(snp_info)
+```
+
+Description of columns:
+  
+  1. ...
+  2. ...
+  3. ...
+
+## Summary for a single SNP
+
+Let's extract information about particular SNP
+
+```{r}
+
+snp_info['rs6212914',]
+```
+
+What is the distribution of genotypes for this SNP across samples
+
+```{r}
+
+table(as.character(gtdata(ge03d2[,'rs6212914'])))
+
+```
+
+Let's estiamte effective allele frequency for this SNP using different ways
+
+```{r}
+
+(snp_info['rs6212914','P.12'] + snp_info['rs6212914','P.22'] * 2) / snp_info['rs6212914','NoMeasured']
+
+mean(as.numeric(gtdata(ge03d2[,'rs6212914'])), na.rm=TRUE)
+
+```
+Let's perform HWE test for this SNP
+
+```{r}
+HWE.show(ge03d2[,'rs6212914'])
+```
