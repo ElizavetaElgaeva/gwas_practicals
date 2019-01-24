@@ -11,13 +11,11 @@ output:
 
 # Outline of the practicals
 
-The practical session consists of XXX steps:
+The practical session consists of three steps:
 
  1. Exploring phenotype data
- 2. Exploring genotype data
- 3. Quality control of genotype data
+ 2. Exploring genotype data and quality control
  4. Association analysis and GWAS
- 5. Vizualization of the results
 
 ## Loading phenotype data
 
