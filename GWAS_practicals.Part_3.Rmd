@@ -43,6 +43,74 @@ nids(ge03d2clean)
 
 nsnps(ge03d2clean)
 ```
+
+## Single SNP association analysis
+
+Let's run association analysis for a single SNP.
+For this we will store genotypes for this SNP in separate object.
+
+```{r}
+
+snpnames(ge03d2clean)[1:10]
+
+my_snp_num <- as.numeric(gtdata(ge03d2clean[,'rs1646456']))
+
+my_snp_cha <- as.character(gtdata(ge03d2clean[,'rs1646456']))
+
+```
+
+Let's check the distribution of genotypes across samples
+
+```{r}
+
+table(my_snp_cha)
+table(my_snp_num)
+```
+
+Let's run logistic regresion with SNP as predictor and dm2 as outcome.
+
+```{r}
+log_reg_snp <- glm(phdata(ge03d2clean)$dm2~my_snp_num)
+
+summary(log_reg_snp)
+```
+
+As we can see, there is no association at all.
+Let's check the distribution of cases and controls across genotypes.
+
+```{r}
+table(phdata(ge03d2clean)$dm2,my_snp_cha)
+```
+
+Indeed, the distribution of cases and controls across genotypes is random.
+
+## Genome-wide association scan
+
+Now let's run tiny GWAS :). We will use qtscore function of GenABEL package.
+Basically, we will run 7000 regressions.
+
+```{r}
+qt_simple <- qtscore(dm2, ge03d2clean, trait="binomial")
+
+descriptives.scan(qt_simple , sort="Pc1df")
+
+```
+
+```{r}
+qt_sex_age_bmi <- qtscore(dm2 ~ sex + age + bmi, ge03d2clean, trait="binomial")
+
+descriptives.scan(qt_sex_age_bmi , sort="Pc1df")
+
+```
+
+## Manhattan plot
+
+## Regional assoc plot
+
+## Table of genotypes and c/c status for the best SNP
+
+## Saving summary stats
+
 ## Additional literature: 
 
 Aulchenko, Yurii S., Karssen, Lennart C., & The GenABEL project developers. (2015). The GenABEL Tutorial. Zenodo. http://doi.org/10.5281/zenodo.19738
