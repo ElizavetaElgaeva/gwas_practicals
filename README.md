@@ -3,6 +3,7 @@
 Repository stores materials and scripts for practical session on GWAS.
 
 Authors:
+
 	1. Sodbo Sharapov <sharapovsodbo@gmail.com>
 	2. Yurii Aulchenko <y.s.aulchenko@polyomica.com>
 	3. GenABEL developers <genabel.org>
