@@ -42,8 +42,17 @@ Let's get the Structure of ge03d2 object
 str(ge03d2)
 ```
 
-Genotypes are stored as a huge N x M table, where N is number of IDs and M is a number of SNPs.
+The other part of an object of gwaa.data-class is gtdata, which contains
+all GWA genetic information in an object of class snp.data class. It is not
+supposed to be modified directly by user. Genotypes are stored as a huge 
+N x M table, where N is number of IDs and M is a number of SNPs.
+The genotypic data can be accessed through the gtdata function, e.g.
 
+```{r}
+gtdata(ge03d2[1;10,1:10])
+```
+
+gtdata can be transformed to numeric or character data
 ```{r}
 
 as.numeric(gtdata(ge03d2[1:5,1:5]))
@@ -51,7 +60,8 @@ as.numeric(gtdata(ge03d2[1:5,1:5]))
 as.character(gtdata(ge03d2[1:5,1:5]))
 ```
 
-How many IDs and SNPs do we have in our data?
+The number of individuals described in an object of gwaa.data-class can
+be accessed through nids function and the number of SNPs using the nsnps function:
 
 ```{r}
 nids(ge03d2)
@@ -73,6 +83,7 @@ Description of columns:
   3. ...
 
 What is the distribution of number of SNPs per chromosome?
+
 ```{r}
 
 table(chromosome(ge03d2))
