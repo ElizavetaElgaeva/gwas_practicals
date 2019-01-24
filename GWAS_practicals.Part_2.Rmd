@@ -49,7 +49,7 @@ N x M table, where N is number of IDs and M is a number of SNPs.
 The genotypic data can be accessed through the gtdata function, e.g.
 
 ```{r}
-gtdata(ge03d2[1;10,1:10])
+gtdata(ge03d2[1:10,1:10])
 ```
 
 gtdata can be transformed to numeric or character data

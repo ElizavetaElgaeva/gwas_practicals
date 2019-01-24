@@ -79,6 +79,38 @@ str(ge03d2)
 ##   .. .. .. .. ..@ .Data: raw [1:238, 1:7589] 99 57 9a 6a ...
 ```
 
+The object you have loaded, ge03d2, belongs to the gwaa.data class. This is a
+special R class developed to facilitate GWA analysis.
+In GWA analysis, different types of data are used. These include the pheno-
+typic and genotypic data on the study participants and chromosome and location
+of every SNP. For every SNP, it is desirable to know the details of coding (how
+are the alleles coded? – A, T, G, C? – as well as the strand – ’+’ or ’-’, ’top’ or
+’bot’ ? – this coding is for).
+One could attempt to store all phenotypes and genotypes together in a single
+table, using, e.g. one row per study subject; than the columns will correspond
+to study phenotypes and SNPs. For a typical GWA data set, this would lead
+to a table of few thousands rows and few hundreds of thousands to millions of
+columns. Such a format is generated when one downloads HapMap data for a
+region. To store GWA data in such tables internally, within R, proves to be
+inefficient. In GenABEL-package, a special data class, gwaa.data-class is used
+to store GWA data.
+You may consider an object of gwaa.data-class as a ’black box’ from which
+you can get specific data using specific functions. If you are interested in the in-
+ternal structure of the gwaa.data-class, you can find the description in section
+B.1 (Internal structure of gwaa.data-class) in GenABEL tutorial.
+
+The number of individuals described in an object of gwaa.data-class can
+be accessed through nids function
+
+
+```r
+nids(ge03d2)
+```
+
+```
+## [1] 950
+```
+
 Let's save phenotype data into separate object named *pheno*.
 And look at the first rows of the *pheno* object
 
@@ -98,6 +130,13 @@ head(pheno)
 ## id35 id35   0 49.88   1  157.2  84.28    0 34.11
 ## id58 id58   0 37.00   1  165.1  89.54    0 32.85
 ```
+The rows of this data frame correspond to th estudy subjects, and the columns
+correspond to the variables. There are two default variables, which are always
+present in phdata. The first of these is “id”, which contains study subject
+identification code. This identification code can be arbitrary character, numer,
+or alphanumeric combination, but every person must be coded with an unique
+ID. The second default variable is “sex”, where males are coded with ones (“1”)
+and females are coded with zero (“0”).
 
 ## Summary of phenotype data
 
@@ -180,25 +219,25 @@ You can plot a historgram for quantitaive traits
 hist(pheno$age, main='Histogram of age', xlab = 'Age')
 ```
 
-![](GWAS_practicals.Part_1_files/figure-html/unnamed-chunk-7-1.png)<!-- -->
+![](GWAS_practicals.Part_1_files/figure-html/unnamed-chunk-8-1.png)<!-- -->
 
 ```r
 hist(pheno$height, main='Histogram of height', xlab = 'Height')
 ```
 
-![](GWAS_practicals.Part_1_files/figure-html/unnamed-chunk-7-2.png)<!-- -->
+![](GWAS_practicals.Part_1_files/figure-html/unnamed-chunk-8-2.png)<!-- -->
 
 ```r
 hist(pheno$weight, main='Histogram of weight', xlab = 'Weight')
 ```
 
-![](GWAS_practicals.Part_1_files/figure-html/unnamed-chunk-7-3.png)<!-- -->
+![](GWAS_practicals.Part_1_files/figure-html/unnamed-chunk-8-3.png)<!-- -->
 
 ```r
 hist(pheno$bmi, main='Histogram of bmi', xlab = 'BMI')
 ```
 
-![](GWAS_practicals.Part_1_files/figure-html/unnamed-chunk-7-4.png)<!-- -->
+![](GWAS_practicals.Part_1_files/figure-html/unnamed-chunk-8-4.png)<!-- -->
 
 ## Test for normality
 
@@ -248,7 +287,7 @@ Distribution of BMI has left skewness. Log transformation can transform it to mo
 hist(log(pheno$bmi), main='Histogram of logBMI', xlab = 'logBMI')
 ```
 
-![](GWAS_practicals.Part_1_files/figure-html/unnamed-chunk-9-1.png)<!-- -->
+![](GWAS_practicals.Part_1_files/figure-html/unnamed-chunk-10-1.png)<!-- -->
 
 ```r
 shapiro.test(log(pheno$bmi))
@@ -268,7 +307,8 @@ shapiro.test(log(pheno$bmi))
 
 It is important to check whether your trait of interest is correlated with covariates.
 To eheck this you can estimate the Peasron correlation coefficient and/or perform linear regression analysis.
-First, let's examine the correlation structure for phenotype data
+First, let's examine the correlation structure for phenotype data.
+
 
 ```r
 cor_matrix <- cor(pheno[,c('dm2','sex','age','height','weight','bmi','diet')], use='complete.obs')
@@ -301,7 +341,7 @@ library(corrplot)
 corrplot(cor_matrix)
 ```
 
-![](GWAS_practicals.Part_1_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+![](GWAS_practicals.Part_1_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 Heatmap clearly shows that dm2 is correlated with weight and bmi.
 

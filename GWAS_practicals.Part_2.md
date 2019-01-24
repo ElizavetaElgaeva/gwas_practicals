@@ -79,8 +79,35 @@ str(ge03d2)
 ##   .. .. .. .. ..@ .Data: raw [1:238, 1:7589] 99 57 9a 6a ...
 ```
 
-Genotypes are stored as a huge N x M table, where N is number of IDs and M is a number of SNPs.
+The other part of an object of gwaa.data-class is gtdata, which contains
+all GWA genetic information in an object of class snp.data class. It is not
+supposed to be modified directly by user. Genotypes are stored as a huge 
+N x M table, where N is number of IDs and M is a number of SNPs.
+The genotypic data can be accessed through the gtdata function, e.g.
 
+
+```r
+gtdata(ge03d2[1:10,1:10])
+```
+
+```
+## @nids = 10 
+## @nsnps = 10 
+## @nbytes = 3 
+## @idnames = id4 id10 id25 id33 id35 id58 id68 id74 id107 id119 
+## @snpnames = rs1646456 rs7950586 rs4785242 rs4435802 rs2847446 rs9308393 rs946364 rs299251 rs2456488 rs1292700 
+## @chromosome = 1 1 1 1 1 1 1 1 1 1 
+## @coding =  11 07 09 0f 07 09 09 04 0d 05 
+## @strand =  01 02 02 01 01 01 02 01 01 02 
+## @map = 653 849 1766 5291 5555 6739 8533 10737 11779 12710 
+## @male = 0 1 0 0 0 0 1 1 0 1 
+## @gtps = 
+## 80 80 80 80 40 40 40 40 40 c0 
+## 40 40 80 40 80 40 40 40 80 80 
+## 80 40 c0 80 80 40 40 40 80 80
+```
+
+gtdata can be transformed to numeric or character data
 
 ```r
 as.numeric(gtdata(ge03d2[1:5,1:5]))
@@ -108,7 +135,8 @@ as.character(gtdata(ge03d2[1:5,1:5]))
 ## id35 "C/C"     "T/T"     "C/C"     "C/C"     "A/A"
 ```
 
-How many IDs and SNPs do we have in our data?
+The number of individuals described in an object of gwaa.data-class can
+be accessed through nids function and the number of SNPs using the nsnps function:
 
 
 ```r
@@ -160,6 +188,7 @@ Description of columns:
   3. ...
 
 What is the distribution of number of SNPs per chromosome?
+
 
 ```r
 table(chromosome(ge03d2))
@@ -271,7 +300,7 @@ Let's look at the distribution of EAF - effective allele frequency.
 hist(snp_info$EAF, breaks=50)
 ```
 
-![](GWAS_practicals.Part_2_files/figure-html/unnamed-chunk-13-1.png)<!-- -->
+![](GWAS_practicals.Part_2_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
 
 There are a lot of SNPs with EAF below 0.05 and above 0.95.
 
@@ -282,7 +311,7 @@ What about call rate?
 hist(snp_info$CallRate, breaks=50)
 ```
 
-![](GWAS_practicals.Part_2_files/figure-html/unnamed-chunk-14-1.png)<!-- -->
+![](GWAS_practicals.Part_2_files/figure-html/unnamed-chunk-15-1.png)<!-- -->
 
 What about HWE test?
 
@@ -348,7 +377,7 @@ Let's check the distribution of per-ID call rate. It can give information about 
 hist(idsummary$CallPP, breaks=100)
 ```
 
-![](GWAS_practicals.Part_2_files/figure-html/unnamed-chunk-18-1.png)<!-- -->
+![](GWAS_practicals.Part_2_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
 
 Few samples have low per-ID call rate.
 
@@ -359,7 +388,7 @@ What about heterozigosity rate?
 hist(idsummary$Het, breaks=100)
 ```
 
-![](GWAS_practicals.Part_2_files/figure-html/unnamed-chunk-19-1.png)<!-- -->
+![](GWAS_practicals.Part_2_files/figure-html/unnamed-chunk-20-1.png)<!-- -->
 
 Few samples have outlying heterozigosity rate, that may indicate DNA sample contamination.
 
@@ -515,7 +544,7 @@ qc1 <- check.marker(ge03d2, p.level = 0, maf = 0.01, perid.call = 0.97, callrate
 ## Mean autosomal HET is 0.2657 (s.e. 0.02132)
 ## 4 (0.4283%) people excluded because too high autosomal heterozygosity (FDR <1%)
 ## Excluded people had HET >= 0.4789
-## Mean IBS is 0.7772 (s.e. 0.01731), as based on 2000 autosomal markers
+## Mean IBS is 0.7813 (s.e. 0.01732), as based on 2000 autosomal markers
 ## 8 (0.8565%) people excluded because of too high IBS (>=0.95)
 ## In total, 7145 (94.26%) markers passed all criteria
 ## In total, 918 (98.29%) people passed all criteria
@@ -528,7 +557,7 @@ qc1 <- check.marker(ge03d2, p.level = 0, maf = 0.01, perid.call = 0.97, callrate
 ## 0 (0%) people excluded because of low (<97%) call rate
 ## Mean autosomal HET is 0.266 (s.e. 0.01573)
 ## 0 people excluded because too high autosomal heterozygosity (FDR <1%)
-## Mean IBS is 0.7798 (s.e. 0.01738), as based on 2000 autosomal markers
+## Mean IBS is 0.7796 (s.e. 0.01656), as based on 2000 autosomal markers
 ## 0 (0%) people excluded because of too high IBS (>=0.95)
 ## In total, 7111 (99.52%) markers passed all criteria
 ## In total, 918 (100%) people passed all criteria
@@ -541,7 +570,7 @@ qc1 <- check.marker(ge03d2, p.level = 0, maf = 0.01, perid.call = 0.97, callrate
 ## 0 (0%) people excluded because of low (<97%) call rate
 ## Mean autosomal HET is 0.266 (s.e. 0.01573)
 ## 0 people excluded because too high autosomal heterozygosity (FDR <1%)
-## Mean IBS is 0.7779 (s.e. 0.01628), as based on 2000 autosomal markers
+## Mean IBS is 0.7788 (s.e. 0.01669), as based on 2000 autosomal markers
 ## 0 (0%) people excluded because of too high IBS (>=0.95)
 ## In total, 7111 (100%) markers passed all criteria
 ## In total, 918 (100%) people passed all criteria
@@ -591,7 +620,7 @@ qc2 <- check.marker(ge03d2,
 ## Mean autosomal HET is 0.2657 (s.e. 0.02132)
 ## 4 (0.4283%) people excluded because too high autosomal heterozygosity (FDR <1%)
 ## Excluded people had HET >= 0.4789
-## Mean IBS is 0.7803 (s.e. 0.01724), as based on 2000 autosomal markers
+## Mean IBS is 0.7799 (s.e. 0.01783), as based on 2000 autosomal markers
 ## 8 (0.8565%) people excluded because of too high IBS (>=0.95)
 ## In total, 7145 (94.26%) markers passed all criteria
 ## In total, 918 (98.29%) people passed all criteria
@@ -604,7 +633,7 @@ qc2 <- check.marker(ge03d2,
 ## 0 (0%) people excluded because of low (<97%) call rate
 ## Mean autosomal HET is 0.266 (s.e. 0.01573)
 ## 0 people excluded because too high autosomal heterozygosity (FDR <1%)
-## Mean IBS is 0.7756 (s.e. 0.01615), as based on 2000 autosomal markers
+## Mean IBS is 0.7777 (s.e. 0.01569), as based on 2000 autosomal markers
 ## 0 (0%) people excluded because of too high IBS (>=0.95)
 ## In total, 7111 (99.52%) markers passed all criteria
 ## In total, 918 (100%) people passed all criteria
@@ -617,7 +646,7 @@ qc2 <- check.marker(ge03d2,
 ## 0 (0%) people excluded because of low (<97%) call rate
 ## Mean autosomal HET is 0.266 (s.e. 0.01573)
 ## 0 people excluded because too high autosomal heterozygosity (FDR <1%)
-## Mean IBS is 0.7775 (s.e. 0.01634), as based on 2000 autosomal markers
+## Mean IBS is 0.7796 (s.e. 0.01596), as based on 2000 autosomal markers
 ## 0 (0%) people excluded because of too high IBS (>=0.95)
 ## In total, 7111 (100%) markers passed all criteria
 ## In total, 918 (100%) people passed all criteria
@@ -679,7 +708,7 @@ We can present the results graphically by
 plot(data.mds)
 ```
 
-![](GWAS_practicals.Part_2_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+![](GWAS_practicals.Part_2_files/figure-html/unnamed-chunk-28-1.png)<!-- -->
 
 The resulting plot is shown in figure. Each point on the plot corresponds
 to a person, and the 2D distances between points were fitted to be as close as
@@ -729,7 +758,7 @@ qc3 <- check.marker(ge03d2[clean_ids,],
 ## 0 (0%) people excluded because of low (<97%) call rate
 ## Mean autosomal HET is 0.2669 (s.e. 0.01569)
 ## 0 people excluded because too high autosomal heterozygosity (FDR <1%)
-## Mean IBS is 0.7814 (s.e. 0.01197), as based on 2000 autosomal markers
+## Mean IBS is 0.7852 (s.e. 0.01182), as based on 2000 autosomal markers
 ## 0 (0%) people excluded because of too high IBS (>=0.95)
 ## In total, 7090 (93.54%) markers passed all criteria
 ## In total, 893 (100%) people passed all criteria
@@ -742,7 +771,7 @@ qc3 <- check.marker(ge03d2[clean_ids,],
 ## 0 (0%) people excluded because of low (<97%) call rate
 ## Mean autosomal HET is 0.2669 (s.e. 0.01569)
 ## 0 people excluded because too high autosomal heterozygosity (FDR <1%)
-## Mean IBS is 0.7836 (s.e. 0.012), as based on 2000 autosomal markers
+## Mean IBS is 0.7796 (s.e. 0.01201), as based on 2000 autosomal markers
 ## 0 (0%) people excluded because of too high IBS (>=0.95)
 ## In total, 7090 (100%) markers passed all criteria
 ## In total, 893 (100%) people passed all criteria

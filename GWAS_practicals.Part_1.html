@@ -238,6 +238,10 @@ $(document).ready(function () {
 ##   .. .. .. ..- attr(*, &quot;names&quot;)= chr [1:950] &quot;id4&quot; &quot;id10&quot; &quot;id25&quot; &quot;id33&quot; ...
 ##   .. .. ..@ gtps      :Formal class 'snp.mx' [package &quot;GenABEL&quot;] with 1 slot
 ##   .. .. .. .. ..@ .Data: raw [1:238, 1:7589] 99 57 9a 6a ...</code></pre>
+<p>The object you have loaded, ge03d2, belongs to the gwaa.data class. This is a special R class developed to facilitate GWA analysis. In GWA analysis, different types of data are used. These include the pheno- typic and genotypic data on the study participants and chromosome and location of every SNP. For every SNP, it is desirable to know the details of coding (how are the alleles coded? – A, T, G, C? – as well as the strand – ’+’ or ’-’, ’top’ or ’bot’ ? – this coding is for). One could attempt to store all phenotypes and genotypes together in a single table, using, e.g. one row per study subject; than the columns will correspond to study phenotypes and SNPs. For a typical GWA data set, this would lead to a table of few thousands rows and few hundreds of thousands to millions of columns. Such a format is generated when one downloads HapMap data for a region. To store GWA data in such tables internally, within R, proves to be inefficient. In GenABEL-package, a special data class, gwaa.data-class is used to store GWA data. You may consider an object of gwaa.data-class as a ’black box’ from which you can get specific data using specific functions. If you are interested in the in- ternal structure of the gwaa.data-class, you can find the description in section B.1 (Internal structure of gwaa.data-class) in GenABEL tutorial.</p>
+<p>The number of individuals described in an object of gwaa.data-class can be accessed through nids function</p>
+<pre class="r"><code>nids(ge03d2)</code></pre>
+<pre><code>## [1] 950</code></pre>
 <p>Let’s save phenotype data into separate object named <em>pheno</em>. And look at the first rows of the <em>pheno</em> object</p>
 <pre class="r"><code>pheno &lt;- phdata(ge03d2)
 
@@ -249,6 +253,7 @@ head(pheno)</code></pre>
 ## id33 id33   0 44.67   1  174.5  69.73    0 22.91
 ## id35 id35   0 49.88   1  157.2  84.28    0 34.11
 ## id58 id58   0 37.00   1  165.1  89.54    0 32.85</code></pre>
+<p>The rows of this data frame correspond to th estudy subjects, and the columns correspond to the variables. There are two default variables, which are always present in phdata. The first of these is “id”, which contains study subject identification code. This identification code can be arbitrary character, numer, or alphanumeric combination, but every person must be coded with an unique ID. The second default variable is “sex”, where males are coded with ones (“1”) and females are coded with zero (“0”).</p>
 </div>
 <div id="summary-of-phenotype-data" class="section level2">
 <h2>Summary of phenotype data</h2>
@@ -340,7 +345,7 @@ head(pheno)</code></pre>
 </div>
 <div id="correlation-structure" class="section level2">
 <h2>Correlation structure</h2>
-<p>It is important to check whether your trait of interest is correlated with covariates. To eheck this you can estimate the Peasron correlation coefficient and/or perform linear regression analysis. First, let’s examine the correlation structure for phenotype data</p>
+<p>It is important to check whether your trait of interest is correlated with covariates. To eheck this you can estimate the Peasron correlation coefficient and/or perform linear regression analysis. First, let’s examine the correlation structure for phenotype data.</p>
 <pre class="r"><code>cor_matrix &lt;- cor(pheno[,c('dm2','sex','age','height','weight','bmi','diet')], use='complete.obs')
 
 cor_matrix</code></pre>
