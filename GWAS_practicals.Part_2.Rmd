@@ -264,7 +264,68 @@ ge03d2clean <- ge03d2[qc2$idok,qc2$snpok]
 
 ```
 
+## Finding genetic sub-structure
 
+Now, we are ready for the second round of QC – detection of genetic outliers
+which may contaminate our results. We will detect genetic outliers using a
+technique, which resembles the one suggested by Price at al.
+As the first step, we will compute a matrix of genomic kinship between all
+pairs of individuals, using only autosomal 2 markers by
+
+```{r}
+gkin <- ibs(ge03d2clean[, autosomal(ge03d2clean)], weight="freq")
+
+gkin[1:5, 1:5]
+```
+
+The numbers below the diagonal show the genomic estimate of kinship (aka
+’genomic kinship’ or ’genome-wide IBD’), the numbers on the diagonal corre-
+spond to 0.5 plus the genomic homozigosity, and the numbers above the diagonal
+tell how many SNPs were typed successfully for both subjects (thus the IBD
+estimate is derived using this number of SNPs).
+Second, we transform this matrix to a distance matrix using standard R
+command
+
+```{r}
+data.dist <- as.dist(0.5 - gkin)
+```
+
+Finally, we perform Classical Multidimensional Scaling by
+```{r}
+data.mds <- cmdscale(data.dist)
+```
+
+We can present the results graphically by
+```{r}
+plot(data.mds)
+```
+
+The resulting plot is shown in figure. Each point on the plot corresponds
+to a person, and the 2D distances between points were fitted to be as close as
+possible to those presented in the original IBS matrix. You can see that study
+subjects clearly cluster in two groups. Let's get id names of samples from the second cluster and removed them from the data and re-run QC
+
+```{r}
+
+clean_ids <- rownames(data.mds)[data.mds[,1]<0.1]
+
+controls_clean <- intersect(clean_ids,idnames(ge03d2clean)[phdata(ge03d2clean)$dm2==0])
+
+qc3 <- check.marker(ge03d2[clean_ids,], 
+                    p.level = 1e-6, 
+                    maf = 0.01, 
+                    perid.call = 0.97, 
+                    callrate = 0.97,
+                    hweidsubset = controls_clean)
+
+ge03d2clean <- ge03d2[qc3$idok,qc3$snpok]
+```
+
+Finally, let's save the data for GWAS
+
+```{r}
+save(ge03d2clean, file='data/ge02d2clean.RData')
+```
 ## Additional literature: 
 
 Aulchenko, Yurii S., Karssen, Lennart C., & The GenABEL project developers. (2015). The GenABEL Tutorial. Zenodo. http://doi.org/10.5281/zenodo.19738

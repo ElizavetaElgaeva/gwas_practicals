@@ -515,7 +515,7 @@ qc1 <- check.marker(ge03d2, p.level = 0, maf = 0.01, perid.call = 0.97, callrate
 ## Mean autosomal HET is 0.2657 (s.e. 0.02132)
 ## 4 (0.4283%) people excluded because too high autosomal heterozygosity (FDR <1%)
 ## Excluded people had HET >= 0.4789
-## Mean IBS is 0.7761 (s.e. 0.01639), as based on 2000 autosomal markers
+## Mean IBS is 0.7772 (s.e. 0.01731), as based on 2000 autosomal markers
 ## 8 (0.8565%) people excluded because of too high IBS (>=0.95)
 ## In total, 7145 (94.26%) markers passed all criteria
 ## In total, 918 (98.29%) people passed all criteria
@@ -528,7 +528,7 @@ qc1 <- check.marker(ge03d2, p.level = 0, maf = 0.01, perid.call = 0.97, callrate
 ## 0 (0%) people excluded because of low (<97%) call rate
 ## Mean autosomal HET is 0.266 (s.e. 0.01573)
 ## 0 people excluded because too high autosomal heterozygosity (FDR <1%)
-## Mean IBS is 0.7772 (s.e. 0.01765), as based on 2000 autosomal markers
+## Mean IBS is 0.7798 (s.e. 0.01738), as based on 2000 autosomal markers
 ## 0 (0%) people excluded because of too high IBS (>=0.95)
 ## In total, 7111 (99.52%) markers passed all criteria
 ## In total, 918 (100%) people passed all criteria
@@ -541,7 +541,7 @@ qc1 <- check.marker(ge03d2, p.level = 0, maf = 0.01, perid.call = 0.97, callrate
 ## 0 (0%) people excluded because of low (<97%) call rate
 ## Mean autosomal HET is 0.266 (s.e. 0.01573)
 ## 0 people excluded because too high autosomal heterozygosity (FDR <1%)
-## Mean IBS is 0.7754 (s.e. 0.0166), as based on 2000 autosomal markers
+## Mean IBS is 0.7779 (s.e. 0.01628), as based on 2000 autosomal markers
 ## 0 (0%) people excluded because of too high IBS (>=0.95)
 ## In total, 7111 (100%) markers passed all criteria
 ## In total, 918 (100%) people passed all criteria
@@ -591,7 +591,7 @@ qc2 <- check.marker(ge03d2,
 ## Mean autosomal HET is 0.2657 (s.e. 0.02132)
 ## 4 (0.4283%) people excluded because too high autosomal heterozygosity (FDR <1%)
 ## Excluded people had HET >= 0.4789
-## Mean IBS is 0.7785 (s.e. 0.01697), as based on 2000 autosomal markers
+## Mean IBS is 0.7803 (s.e. 0.01724), as based on 2000 autosomal markers
 ## 8 (0.8565%) people excluded because of too high IBS (>=0.95)
 ## In total, 7145 (94.26%) markers passed all criteria
 ## In total, 918 (98.29%) people passed all criteria
@@ -604,7 +604,7 @@ qc2 <- check.marker(ge03d2,
 ## 0 (0%) people excluded because of low (<97%) call rate
 ## Mean autosomal HET is 0.266 (s.e. 0.01573)
 ## 0 people excluded because too high autosomal heterozygosity (FDR <1%)
-## Mean IBS is 0.7779 (s.e. 0.01602), as based on 2000 autosomal markers
+## Mean IBS is 0.7756 (s.e. 0.01615), as based on 2000 autosomal markers
 ## 0 (0%) people excluded because of too high IBS (>=0.95)
 ## In total, 7111 (99.52%) markers passed all criteria
 ## In total, 918 (100%) people passed all criteria
@@ -617,7 +617,7 @@ qc2 <- check.marker(ge03d2,
 ## 0 (0%) people excluded because of low (<97%) call rate
 ## Mean autosomal HET is 0.266 (s.e. 0.01573)
 ## 0 people excluded because too high autosomal heterozygosity (FDR <1%)
-## Mean IBS is 0.7794 (s.e. 0.0162), as based on 2000 autosomal markers
+## Mean IBS is 0.7775 (s.e. 0.01634), as based on 2000 autosomal markers
 ## 0 (0%) people excluded because of too high IBS (>=0.95)
 ## In total, 7111 (100%) markers passed all criteria
 ## In total, 918 (100%) people passed all criteria
@@ -630,7 +630,134 @@ QC is done. Now let's save QCed data
 ge03d2clean <- ge03d2[qc2$idok,qc2$snpok]
 ```
 
+## Finding genetic sub-structure
 
+Now, we are ready for the second round of QC – detection of genetic outliers
+which may contaminate our results. We will detect genetic outliers using a
+technique, which resembles the one suggested by Price at al.
+As the first step, we will compute a matrix of genomic kinship between all
+pairs of individuals, using only autosomal 2 markers by
+
+
+```r
+gkin <- ibs(ge03d2clean[, autosomal(ge03d2clean)], weight="freq")
+
+gkin[1:5, 1:5]
+```
+
+```
+##            id4      id10       id25      id33      id35
+## id4   0.452959 6.440e+03  6.444e+03 6.450e+03 6437.0000
+## id10  0.008654 4.707e-01  6.440e+03 6.446e+03 6433.0000
+## id25 -0.007177 8.471e-03  4.872e-01 6.448e+03 6438.0000
+## id33  0.007487 2.117e-02 -2.803e-02 5.035e-01 6441.0000
+## id35 -0.027665 2.158e-02  4.571e-03 2.537e-02    0.5029
+```
+
+The numbers below the diagonal show the genomic estimate of kinship (aka
+’genomic kinship’ or ’genome-wide IBD’), the numbers on the diagonal corre-
+spond to 0.5 plus the genomic homozigosity, and the numbers above the diagonal
+tell how many SNPs were typed successfully for both subjects (thus the IBD
+estimate is derived using this number of SNPs).
+Second, we transform this matrix to a distance matrix using standard R
+command
+
+
+```r
+data.dist <- as.dist(0.5 - gkin)
+```
+
+Finally, we perform Classical Multidimensional Scaling by
+
+```r
+data.mds <- cmdscale(data.dist)
+```
+
+We can present the results graphically by
+
+```r
+plot(data.mds)
+```
+
+![](GWAS_practicals.Part_2_files/figure-html/unnamed-chunk-27-1.png)<!-- -->
+
+The resulting plot is shown in figure. Each point on the plot corresponds
+to a person, and the 2D distances between points were fitted to be as close as
+possible to those presented in the original IBS matrix. You can see that study
+subjects clearly cluster in two groups. Let's get id names of samples from the second cluster and removed them from the data and re-run QC
+
+
+```r
+clean_ids <- rownames(data.mds)[data.mds[,1]<0.1]
+
+controls_clean <- intersect(clean_ids,idnames(ge03d2clean)[phdata(ge03d2clean)$dm2==0])
+
+qc3 <- check.marker(ge03d2[clean_ids,], 
+                    p.level = 1e-6, 
+                    maf = 0.01, 
+                    perid.call = 0.97, 
+                    callrate = 0.97,
+                    hweidsubset = controls_clean)
+```
+
+```
+## Excluding people/markers with extremely low call rate...
+## 7589 markers and 893 people in total
+## 0 people excluded because of call rate < 0.1 
+## 7 markers excluded because of call rate < 0.1 
+## Passed: 7582 markers and 893 people
+## 
+## Running sex chromosome checks...
+## 344 heterozygous X-linked male genotypes found
+## 2 X-linked markers are likely to be autosomal (odds > 1000 )
+## 0 male are likely to be female (odds > 1000 )
+## 0 female are likely to be male (odds > 1000 )
+## 0 people have intermediate X-chromosome inbreeding (0.5 > F > 0.5)
+## If these people/markers are removed, 8 heterozygous male genotypes are left
+## ... these will be considered missing in analysis.
+## ... Use Xfix() to fix these problems.
+## Passed: 7580 markers and 893 people
+## 
+## ... 8 X/Y/mtDNA ( 8 0 0 ) impossible heterozygotes and female Ys set as missing
+## 
+## 
+## RUN 1 
+## 7580 markers and 893 people in total
+## 415 (5.475%) markers excluded as having low (<1%) minor allele frequency
+## 75 (0.9894%) markers excluded because of low (<97%) call rate
+## 37 (0.4881%) markers excluded because they are out of HWE (P <1e-06)
+## 0 (0%) people excluded because of low (<97%) call rate
+## Mean autosomal HET is 0.2669 (s.e. 0.01569)
+## 0 people excluded because too high autosomal heterozygosity (FDR <1%)
+## Mean IBS is 0.7814 (s.e. 0.01197), as based on 2000 autosomal markers
+## 0 (0%) people excluded because of too high IBS (>=0.95)
+## In total, 7090 (93.54%) markers passed all criteria
+## In total, 893 (100%) people passed all criteria
+## 
+## RUN 2 
+## 7090 markers and 893 people in total
+## 0 (0%) markers excluded as having low (<1%) minor allele frequency
+## 0 (0%) markers excluded because of low (<97%) call rate
+## 0 (0%) markers excluded because they are out of HWE (P <1e-06)
+## 0 (0%) people excluded because of low (<97%) call rate
+## Mean autosomal HET is 0.2669 (s.e. 0.01569)
+## 0 people excluded because too high autosomal heterozygosity (FDR <1%)
+## Mean IBS is 0.7836 (s.e. 0.012), as based on 2000 autosomal markers
+## 0 (0%) people excluded because of too high IBS (>=0.95)
+## In total, 7090 (100%) markers passed all criteria
+## In total, 893 (100%) people passed all criteria
+```
+
+```r
+ge03d2clean <- ge03d2[qc3$idok,qc3$snpok]
+```
+
+Finally, let's save the data for GWAS
+
+
+```r
+save(ge03d2clean, file='data/ge02d2clean.RData')
+```
 ## Additional literature: 
 
 Aulchenko, Yurii S., Karssen, Lennart C., & The GenABEL project developers. (2015). The GenABEL Tutorial. Zenodo. http://doi.org/10.5281/zenodo.19738
