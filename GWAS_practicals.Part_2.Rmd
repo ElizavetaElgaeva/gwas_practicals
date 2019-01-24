@@ -1,5 +1,5 @@
 ---
-title: "Practicals GWAS. Exploring genotype data"
+title: "Practicals GWAS. Exploring genotype data and QC"
 author: "Sodbo Sharapov"
 date: "January 22, 2019"
 output:
@@ -13,13 +13,11 @@ knitr::opts_chunk$set(echo = TRUE)
 
 # Outline of the practicals
 
-The practical session consists of five steps:
+The practical session consists of three steps:
 
  1. Exploring phenotype data
- 2. Exploring genotype data
- 3. Quality control of genotype data
+ 2. Exploring genotype data and quality control
  4. Association analysis and GWAS
- 5. Vizualization of the results
 
 ## Loading genotype data
 
@@ -151,7 +149,7 @@ What if we will test HWE using controls?
 
 ```{r}
 
-control_ids <- phdata(ge03d2)$dm2==0
+control_ids <- idnames(ge03d2)[phdata(ge03d2)$dm2==0]
 
 catable(summary(gtdata(ge03d2[control_ids,]))$Pexact, c(0.05/nsnps(ge03d2), 0.01, 0.05, 0.1), cum=TRUE)
 ```
@@ -208,24 +206,66 @@ descriptives.marker(ge03d2, ids=control_ids)
 
 Now let's summarize our observations and perform quality control for genotype data.
 
-Basic QC consists of following steps;
+Basic QC consists of following steps:
 
-  1. Remomving SNPs with
-    1. 
-    2. 
+  1. Identification of individuals with discordant sex information
+    1. X-Heterozygose males
+    2. Y-Heterozygose females
   
-  2. Removing IDs with
-    1.
-    2.
-    
-  3. Run again steps (1) and (2)
+  2. Identification of individuals with elevated missing data rates or outlying heterozygosity rate
+    1. IDs with low call rate (<97%, 98% or 99%)
+    2. IDs with ourlying heterozygosity rate
+      1. Too high - DNA sample contamination 
+      2. Too low - inbreeding
   
-  4. Define population sub-structure
+  3. Identification of duplicated or related individuals
+    1. Estimation of kinship matrix
+    2. IBS=0.5 -> monozygos twins or duplicated samples
+    3. IBS > 0.125 -> close relatives
   
-  5. Remove IDs with outlying ancestry.
+  4. Identification of individuals of divergent ancestry
+    1. PCA analysis using kinship matrix
+    2. 1000 Genomes project data can be used as reference sample
+  
+  5. Removal of all individuals failing QC
+  
+  6. Identification of all markers with an excessive missing data rate
+    1. SNP call rate below 97%
+  
+  7. Removal of all markers failing QC
+  
+
+Let's perform QC using checkmarker function.
+
+```{r}
+
+qc1 <- check.marker(ge03d2, p.level = 0, maf = 0.01, perid.call = 0.97, callrate = 0.97)
+
+```
+
+Now let's define IDs which will be used for HWE test.
+
+```{r}
+hweids <- intersect(control_ids, qc1$idok)
+
+qc2 <- check.marker(ge03d2, 
+                    p.level = 1e-6, 
+                    maf = 0.01, 
+                    perid.call = 0.97, 
+                    callrate = 0.97,
+                    hweidsubset = hweids)
+```
+
+QC is done. Now let's save QCed data
+
+```{r}
+
+ge03d2clean <- ge03d2[qc2$idok,qc2$snpok]
+
+```
 
 
-Additional literature: 
+## Additional literature: 
 
 Aulchenko, Yurii S., Karssen, Lennart C., & The GenABEL project developers. (2015). The GenABEL Tutorial. Zenodo. http://doi.org/10.5281/zenodo.19738
 
