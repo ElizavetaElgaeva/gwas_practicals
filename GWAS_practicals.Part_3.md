@@ -157,12 +157,17 @@ Indeed, the distribution of cases and controls across genotypes is random.
 ## Genome-wide association scan
 
 Now let's run tiny GWAS :). We will use qtscore function of GenABEL package.
-Basically, we will run 7000 regressions.
+Basically, we will run 7000 regressions. We will run GWAS for dm2 with age and sex as covariates
 
 
 ```r
-qt_simple <- qtscore(dm2, ge03d2clean, trait="binomial")
+qt_simple <- mlreg(dm2~sex+age, data=ge03d2clean, trait="binomial")
+```
 
+Let's have a look at the top 10 signals
+
+
+```r
 descriptives.scan(qt_simple , sort="Pc1df")
 ```
 
@@ -171,41 +176,39 @@ descriptives.scan(qt_simple , sort="Pc1df")
 ```
 
 ```
-##           Chromosome Position Strand A1 A2   N   effB se_effB chi2.1df
-## rs7903146          1  1047389      +  A  T 887 0.4732 0.09238    26.24
-## rs289981           1  1043860      -  T  G 882 1.6084 0.35859    20.12
-## rs3436694          2  8921418      -  C  G 885 2.0983 0.47455    19.55
-## rs70099            2  8857747      +  C  A 883 2.3164 0.52491    19.47
-## rs7064741          1  1044233      -  C  G 885 0.6176 0.14989    16.98
-## rs2975760          3 10518480      +  A  T 888 1.4799 0.38810    14.54
-## rs3074653          2  8915495      -  G  C 885 1.6536 0.44798    13.63
-## rs5743183          1   648911      +  C  T 882 0.5026 0.14067    12.76
-## rs9386314          1   756075      -  C  A 889 0.6716 0.19058    12.42
-## rs1801282          2  8931192      +  C  T 882 1.6314 0.46993    12.05
-##                P1df  effAB  effBB chi2.2df      P2df     Pc1df
-## rs7903146 3.008e-07 0.5219 0.1037    26.80 1.512e-06 1.550e-06
-## rs289981  7.280e-06 1.3125 2.3067    21.00 2.751e-05 2.591e-05
-## rs3436694 9.791e-06 1.9610    Inf    20.49 3.552e-05 3.368e-05
-## rs70099   1.020e-05 2.1524    Inf    20.04 4.449e-05 3.491e-05
-## rs7064741 3.784e-05 0.5769 0.4686    17.83 1.343e-04 1.114e-04
-## rs2975760 1.372e-04 1.1014 3.3707    22.84 1.097e-05 3.484e-04
-## rs3074653 2.231e-04 1.5341 4.0687    14.31 7.798e-04 5.361e-04
-## rs5743183 3.533e-04 0.4646 0.6684    13.97 9.240e-04 8.059e-04
-## rs9386314 4.250e-04 0.5848 0.6154    15.00 5.542e-04 9.493e-04
-## rs1801282 5.174e-04 1.5987 3.0346    12.10 2.359e-03 1.130e-03
+##           Chromosome Position Strand A1 A2   N    effB se_effB chi2.1df
+## rs7903146          1  1047389      +  A  T 887 -0.7342  0.1507    23.72
+## rs289981           1  1043860      -  T  G 882  0.4750  0.1103    18.56
+## rs70099            2  8857747      +  C  A 883  0.8369  0.1984    17.80
+## rs3436694          2  8921418      -  C  G 885  0.7212  0.1714    17.70
+## rs7064741          1  1044233      -  C  G 885 -0.4617  0.1186    15.16
+## rs2975760          3 10518480      +  A  T 888  0.3981  0.1059    14.14
+## rs3074653          2  8915495      -  G  C 885  0.5156  0.1405    13.48
+## rs5743183          1   648911      +  C  T 882 -0.6869  0.1976    12.09
+## rs8541156          3 10397400      -  T  C 885 -0.4621  0.1332    12.04
+## rs9386314          1   756075      -  C  A 889 -0.3941  0.1143    11.88
+##                P1df     Pc1df effAB effBB chi2.2df P2df
+## rs7903146 1.111e-06 4.389e-06    NA    NA       NA   NA
+## rs289981  1.648e-05 4.879e-05    NA    NA       NA   NA
+## rs70099   2.460e-05 6.978e-05    NA    NA       NA   NA
+## rs3436694 2.593e-05 7.314e-05    NA    NA       NA   NA
+## rs7064741 9.864e-05 2.416e-04    NA    NA       NA   NA
+## rs2975760 1.696e-04 3.922e-04    NA    NA       NA   NA
+## rs3074653 2.417e-04 5.386e-04    NA    NA       NA   NA
+## rs5743183 5.071e-04 1.046e-03    NA    NA       NA   NA
+## rs8541156 5.208e-04 1.071e-03    NA    NA       NA   NA
+## rs9386314 5.664e-04 1.154e-03    NA    NA       NA   NA
 ```
+
+As you can see, the top associated SNP has P-value of association of 3e-7,
+which is not significant at the genome-wide significance level of 5e-8.
+
+But what would happend if we will bmi as covariate into the model?
 
 
 ```r
-qt_sex_age_bmi <- qtscore(dm2 ~ sex + age + bmi, ge03d2clean, trait="binomial")
-```
+qt_sex_age_bmi <- mlreg(dm2 ~ sex + age + bmi, ge03d2clean, trait="binomial")
 
-```
-## Warning in qtscore(dm2 ~ sex + age + bmi, ge03d2clean, trait = "binomial"):
-## 2 observations deleted due to missingness
-```
-
-```r
 descriptives.scan(qt_sex_age_bmi , sort="Pc1df")
 ```
 
@@ -214,37 +217,136 @@ descriptives.scan(qt_sex_age_bmi , sort="Pc1df")
 ```
 
 ```
-##           Chromosome Position Strand A1 A2   N   effB se_effB chi2.1df
-## rs7903146          1  1047389      +  A  T 885 0.7898  0.1380    32.74
-## rs289981           1  1043860      -  T  G 880 1.1503  0.2515    20.91
-## rs7064741          1  1044233      -  C  G 883 0.8648  0.2004    18.63
-## rs2975760          3 10518480      +  A  T 886 1.1306  0.2749    16.92
-## rs6083205          3 10500286      +  T  G 885 0.8900  0.2325    14.65
-## rs3075920          1  1870260      -  G  T 883 1.1634  0.3165    13.51
-## rs9195215          1  1464966      -  G  C 880 0.8854  0.2529    12.26
-## rs9468596          3 10506420      +  G  A 878 1.1185  0.3208    12.16
-## rs8889070          3 10220702      -  G  A 879 0.8559  0.2463    12.08
-## rs6308770          1  1464229      -  T  A 883 0.8897  0.2643    11.33
-##                P1df  effAB  effBB chi2.2df      P2df     Pc1df
-## rs7903146 1.056e-08 0.8020 0.5825    32.98 6.879e-08 3.297e-08
-## rs289981  4.804e-06 1.0807 1.2777    21.84 1.811e-05 1.005e-05
-## rs7064741 1.585e-05 0.8527 0.7776    19.01 7.430e-05 3.070e-05
-## rs2975760 3.906e-05 1.0489 1.4017    23.32 8.649e-06 7.139e-05
-## rs6083205 1.293e-04 0.8516 0.7745    15.16 5.100e-04 2.189e-04
-## rs3075920 2.374e-04 1.1526 1.4399    13.73 1.045e-03 3.865e-04
-## rs9195215 4.630e-04 0.8912 0.7712    12.31 2.126e-03 7.223e-04
-## rs9468596 4.881e-04 1.0424 1.4192    18.48 9.730e-05 7.589e-04
-## rs8889070 5.100e-04 0.8553 0.7375    12.08 2.378e-03 7.908e-04
-## rs6308770 7.634e-04 0.8963 0.7765    11.40 3.354e-03 1.154e-03
+##           Chromosome Position Strand A1 A2   N    effB se_effB chi2.1df
+## rs7903146          1  1047389      +  A  T 885 -0.9617  0.1689    32.41
+## rs289981           1  1043860      -  T  G 880  0.5529  0.1191    21.55
+## rs7064741          1  1044233      -  C  G 883 -0.5648  0.1281    19.45
+## rs2975760          3 10518480      +  A  T 886  0.4824  0.1142    17.85
+## rs6083205          3 10500286      +  T  G 885 -0.4570  0.1133    16.27
+## rs3075920          1  1870260      -  G  T 883  0.5869  0.1552    14.29
+## rs9468596          3 10506420      +  G  A 878  0.4338  0.1223    12.59
+## rs6079246          2  7048058      +  A  T 882 -1.0377  0.2945    12.41
+## rs8398809          1  1039030      +  A  C 880  0.3701  0.1099    11.33
+## rs6227551          1  1044797      -  C  A 884 -0.9186  0.2735    11.28
+##                P1df     Pc1df effAB effBB chi2.2df P2df
+## rs7903146 1.250e-08 2.916e-08    NA    NA       NA   NA
+## rs289981  3.454e-06 6.112e-06    NA    NA       NA   NA
+## rs7064741 1.035e-05 1.737e-05    NA    NA       NA   NA
+## rs2975760 2.392e-05 3.853e-05    NA    NA       NA   NA
+## rs6083205 5.486e-05 8.488e-05    NA    NA       NA   NA
+## rs3075920 1.563e-04 2.299e-04    NA    NA       NA   NA
+## rs9468596 3.874e-04 5.456e-04    NA    NA       NA   NA
+## rs6079246 4.260e-04 5.973e-04    NA    NA       NA   NA
+## rs8398809 7.629e-04 1.040e-03    NA    NA       NA   NA
+## rs6227551 7.838e-04 1.067e-03    NA    NA       NA   NA
 ```
+
+Now we see one SNP with P-value of 1.056e-08, that is genome-wide significantly associated with T2D.
 
 ## Manhattan plot
 
+Let's plot the Manhattan plot
+
+```r
+plot(qt_sex_age_bmi,df = 1)
+```
+
+![](GWAS_practicals.Part_3_files/figure-html/unnamed-chunk-11-1.png)<!-- -->
+
 ## Regional assoc plot
+
+Now let's zoom Manhattan plot around found signal. This plot is called regional association plot
+
+```r
+gwas_sum <- summary(qt_sex_age_bmi)
+```
+
+```
+## Summary for top 10 results, sorted by P1df
+```
+
+```r
+gwas_sum_sm <- gwas_sum[gwas_sum$Chromosome==1 & gwas_sum$Position>1047389-250000 & gwas_sum$Position<1047389+250000,]
+
+plot(-log10(gwas_sum_sm$P1df)~gwas_sum_sm$Position)
+```
+
+![](GWAS_practicals.Part_3_files/figure-html/unnamed-chunk-12-1.png)<!-- -->
 
 ## Table of genotypes and c/c status for the best SNP
 
+Now let's have a look at the distribution of cases and controls across genotypes of the
+top associated SNP.
+
+
+```r
+table(phdata(ge03d2clean)$dm2,as.character(gtdata(ge03d2clean[,'rs7903146'])))
+```
+
+```
+##    
+##     A/A A/T T/T
+##   0 323 127  18
+##   1 346  71   2
+```
+
+As you can see, the effect size is not big. Let's estimate OR for allele T.
+
+
+```r
+exp(0.7898)
+```
+
+```
+## [1] 2.203
+```
+
+Let's compare results of mlreg with glm
+
+
+```r
+summary(glm(dm2~sex+age+bmi+as.numeric(gtdata(ge03d2clean[,'rs7903146'])),family='binomial', data=phdata(ge03d2clean)))
+```
+
+```
+## 
+## Call:
+## glm(formula = dm2 ~ sex + age + bmi + as.numeric(gtdata(ge03d2clean[, 
+##     "rs7903146"])), family = "binomial", data = phdata(ge03d2clean))
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -2.120  -0.996  -0.499   1.006   2.233  
+## 
+## Coefficients:
+##                                                Estimate Std. Error z value
+## (Intercept)                                    -3.96879    0.43055   -9.22
+## sex                                             0.36877    0.14969    2.46
+## age                                             0.01245    0.00582    2.14
+## bmi                                             0.11187    0.01138    9.83
+## as.numeric(gtdata(ge03d2clean[, "rs7903146"])) -0.96167    0.16893   -5.69
+##                                                Pr(>|z|)
+## (Intercept)                                     < 2e-16
+## sex                                               0.014
+## age                                               0.032
+## bmi                                             < 2e-16
+## as.numeric(gtdata(ge03d2clean[, "rs7903146"]))  1.3e-08
+## 
+## (Dispersion parameter for binomial family taken to be 1)
+## 
+##     Null deviance: 1224.4  on 884  degrees of freedom
+## Residual deviance: 1047.6  on 880  degrees of freedom
+##   (8 observations deleted due to missingness)
+## AIC: 1058
+## 
+## Number of Fisher Scoring iterations: 4
+```
+
+As you can see, the results between mlreg and glm are concordant.
+
 ## Saving summary stats
+
+sum_stats <- 
 
 ## Additional literature: 
 

@@ -87,30 +87,91 @@ Indeed, the distribution of cases and controls across genotypes is random.
 ## Genome-wide association scan
 
 Now let's run tiny GWAS :). We will use qtscore function of GenABEL package.
-Basically, we will run 7000 regressions.
+Basically, we will run 7000 regressions. We will run GWAS for dm2 with age and sex as covariates
 
 ```{r}
-qt_simple <- qtscore(dm2, ge03d2clean, trait="binomial")
-
-descriptives.scan(qt_simple , sort="Pc1df")
-
+qt_simple <- mlreg(dm2~sex+age, data=ge03d2clean, trait="binomial")
 ```
 
+Let's have a look at the top 10 signals
+
 ```{r}
-qt_sex_age_bmi <- qtscore(dm2 ~ sex + age + bmi, ge03d2clean, trait="binomial")
+descriptives.scan(qt_simple , sort="Pc1df")
+```
+
+As you can see, the top associated SNP has P-value of association of 3e-7,
+which is not significant at the genome-wide significance level of 5e-8.
+
+But what would happend if we will bmi as covariate into the model?
+
+```{r}
+qt_sex_age_bmi <- mlreg(dm2 ~ sex + age + bmi, ge03d2clean, trait="binomial")
 
 descriptives.scan(qt_sex_age_bmi , sort="Pc1df")
 
 ```
 
+Now we see one SNP with P-value of 1.056e-08, that is genome-wide significantly associated with T2D.
+
 ## Manhattan plot
+
+Let's plot the Manhattan plot
+```{r}
+plot(qt_sex_age_bmi,df = 1)
+```
 
 ## Regional assoc plot
 
+Now let's zoom Manhattan plot around found signal. This plot is called regional association plot
+```{r}
+gwas_sum <- summary(qt_sex_age_bmi)
+
+gwas_sum_sm <- gwas_sum[gwas_sum$Chromosome==1 & gwas_sum$Position>1047389-250000 & gwas_sum$Position<1047389+250000,]
+
+plot(-log10(gwas_sum_sm$P1df)~gwas_sum_sm$Position)
+
+```
+
 ## Table of genotypes and c/c status for the best SNP
 
-## Saving summary stats
+Now let's have a look at the distribution of cases and controls across genotypes of the
+top associated SNP.
 
+```{r}
+table(phdata(ge03d2clean)$dm2,as.character(gtdata(ge03d2clean[,'rs7903146'])))
+```
+
+As you can see, the effect size is not big. Let's estimate OR for allele T.
+
+```{r}
+exp(0.7898)
+```
+
+Let's compare results of mlreg with glm
+
+```{r}
+summary(glm(dm2~sex+age+bmi+as.numeric(gtdata(ge03d2clean[,'rs7903146'])),family='binomial', data=phdata(ge03d2clean)))
+```
+
+As you can see, the results between mlreg and glm are concordant.
+
+## Saving summary stats
+# rsid snpid chr pos a1 a0 n freq1 beta1 se p strand direction
+```{r}
+sum_stats <- results(qt_sex_age_bmi)
+
+snp_info <- summary(gtdata(ge03d2clean))
+
+sum_stats2write <- sum_stats[,c('Chromosome','Position','A2','A1','N','effB','se_effB','P1df','Strand')]
+
+sum_stats2write <- cbind(rownames(snp_info),rownames(snp_info),sum_stats2write)
+
+sum_stats2write <- cbind(sum_stats2write[,c(1:7)],snp_info$Q.2,sum_stats2write[,c(8:11)])
+
+colnames(sum_stats2write) <- c('rsid','snpid','chr','pos','a1','a0','n','freq1','beta1','se','p','strand')
+
+write.table(sum_stats2write,file='results/sum_stats.tsv', sep='\t', quote = FALSE,row.names = FALSE)
+```
 ## Additional literature: 
 
 Aulchenko, Yurii S., Karssen, Lennart C., & The GenABEL project developers. (2015). The GenABEL Tutorial. Zenodo. http://doi.org/10.5281/zenodo.19738
