@@ -78,13 +78,13 @@ pheno <- phdata(ge03d2)
 
 head(pheno)
 ```
-The rows of this data frame correspond to th estudy subjects, and the columns
-correspond to the variables. There are two default variables, which are always
-present in phdata. The first of these is “id”, which contains study subject
-identification code. This identification code can be arbitrary character, numer,
+The rows of this data frame correspond to the study participants (individuals), and the columns
+correspond to the variables (phenotypes). There are two default variables, which are always
+present in phdata. The first of these is “id”, which contains participant's
+identification code. This identification code can be arbitrary character, number,
 or alphanumeric combination, but every person must be coded with an unique
 ID. The second default variable is “sex”, where males are coded with ones (“1”)
-and females are coded with zero (“0”).
+and females are coded with zero (“0”). Sometimes gender can be coded as "1" for males and "2" for females.
 
 ## Summary of phenotype data
 
@@ -115,7 +115,7 @@ table(pheno$diet)
 
 ## Distribution of traits
 
-You can plot a historgram for quantitaive traits
+You can plot a historgram for quantitaive traits.
 
 ```{r}
 hist(pheno$age, main='Histogram of age', xlab = 'Age')
@@ -134,7 +134,7 @@ shapiro.test(pheno$weight)
 shapiro.test(pheno$bmi)
 ```
 
-Distribution of BMI has left skewness. Log transformation can transform it to moreless normal
+Distribution of BMI has left skewness. Log transformation can help to transform it to normal.
 
 ```{r}
 hist(log(pheno$bmi), main='Histogram of logBMI', xlab = 'logBMI')
@@ -147,7 +147,7 @@ shapiro.test(log(pheno$bmi))
 
 It is important to check whether your trait of interest is correlated with covariates.
 To eheck this you can estimate the Peasron correlation coefficient and/or perform linear regression analysis.
-First, let's examine the correlation structure for phenotype data.
+First, let's examine the correlation structure of phenotype data.
 
 ```{r}
 cor_matrix <- cor(pheno[,c('dm2','sex','age','height','weight','bmi','diet')], use='complete.obs')
@@ -184,8 +184,8 @@ dm2_sex <- glm(dm2~sex,data = pheno,family = 'binomial')
 summary(dm2_sex)
 ```
 
-betaOR for sex is 0.4465, that corresponds to `OR=exp(0.4465)=1.563`, which is concordant with that, calculated from 2x2 table:
+betaOR for sex is 0.4465, that corresponds to `OR=exp(0.4465)=1.563`. It is concordant with that, calculated from 2x2 table:
 ```{r}
 table(pheno$dm2,pheno$sex)
-275*253/210/212
+(275*253)/(210*212)
 ```
