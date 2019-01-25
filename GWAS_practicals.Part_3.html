@@ -388,7 +388,19 @@ plot(-log10(gwas_sum_sm$P1df)~gwas_sum_sm$Position)</code></pre>
 </div>
 <div id="saving-summary-stats" class="section level2">
 <h2>Saving summary stats</h2>
-<p>sum_stats &lt;-</p>
+<pre class="r"><code>sum_stats &lt;- results(qt_sex_age_bmi)
+
+snp_info &lt;- summary(gtdata(ge03d2clean))
+
+sum_stats2write &lt;- sum_stats[,c('Chromosome','Position','A2','A1','N','effB','se_effB','P1df','Strand')]
+
+sum_stats2write &lt;- cbind(rownames(snp_info),rownames(snp_info),sum_stats2write)
+
+sum_stats2write &lt;- cbind(sum_stats2write[,c(1:7)],snp_info$Q.2,sum_stats2write[,c(8:11)])
+
+colnames(sum_stats2write) &lt;- c('rsid','snpid','chr','pos','a1','a0','n','freq1','beta1','se','p','strand')
+
+write.table(sum_stats2write,file='results/sum_stats.tsv', sep='\t', quote = FALSE,row.names = FALSE)</code></pre>
 </div>
 <div id="additional-literature" class="section level2">
 <h2>Additional literature:</h2>

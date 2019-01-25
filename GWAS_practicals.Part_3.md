@@ -346,8 +346,22 @@ As you can see, the results between mlreg and glm are concordant.
 
 ## Saving summary stats
 
-sum_stats <- 
 
+```r
+sum_stats <- results(qt_sex_age_bmi)
+
+snp_info <- summary(gtdata(ge03d2clean))
+
+sum_stats2write <- sum_stats[,c('Chromosome','Position','A2','A1','N','effB','se_effB','P1df','Strand')]
+
+sum_stats2write <- cbind(rownames(snp_info),rownames(snp_info),sum_stats2write)
+
+sum_stats2write <- cbind(sum_stats2write[,c(1:7)],snp_info$Q.2,sum_stats2write[,c(8:11)])
+
+colnames(sum_stats2write) <- c('rsid','snpid','chr','pos','a1','a0','n','freq1','beta1','se','p','strand')
+
+write.table(sum_stats2write,file='results/sum_stats.tsv', sep='\t', quote = FALSE,row.names = FALSE)
+```
 ## Additional literature: 
 
 Aulchenko, Yurii S., Karssen, Lennart C., & The GenABEL project developers. (2015). The GenABEL Tutorial. Zenodo. http://doi.org/10.5281/zenodo.19738

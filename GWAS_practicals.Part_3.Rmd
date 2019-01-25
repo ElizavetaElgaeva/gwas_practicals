@@ -156,7 +156,7 @@ summary(glm(dm2~sex+age+bmi+as.numeric(gtdata(ge03d2clean[,'rs7903146'])),family
 As you can see, the results between mlreg and glm are concordant.
 
 ## Saving summary stats
-# rsid snpid chr pos a1 a0 n freq1 beta1 se p strand direction
+
 ```{r}
 sum_stats <- results(qt_sex_age_bmi)
 
