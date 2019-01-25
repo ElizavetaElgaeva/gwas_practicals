@@ -75,7 +75,7 @@ snp_info <- summary(gtdata(ge03d2))
 head(snp_info)
 ```
 
-Description of columns:
+Description of some columns:
   
   1. Q.2 - frequency of allele 2 (A2)
   2. Pexact - p-value of HWE test
@@ -167,7 +167,7 @@ As you can see, now much less SNPs show deviation from HWE.
 
 ## Per-ID Summary of genotype data
 
-Now let's check the per-ID SNP call rate and heterozygosity rate.
+Now let's check the per-ID call rate and heterozygosity rate.
 
 First let's get per-ID summary of the data.
 ```{r}
@@ -176,13 +176,13 @@ idsummary <- perid.summary(ge03d2)
 head(idsummary)
 ```
 
-Description of columns:
+Description of some columns:
 
-  1. ...
-  2. ...
-  3. ...
+  1. NoMeasured - number of measured SNPs
+  2. NoPoly - number of polymorfic SNPs (SNPs with minor allele frequency > 0)
+  3. Het - heterozigosity rate
   
-Let's check the distribution of per-ID call rate. It can give information about samples with low callrate, that may indicate problems with these samples.
+Let's check the distribution of per-ID call rate. It can give an information about samples with low callrate, that may indicate problems with these samples.
 
 ```{r}
 
@@ -212,7 +212,7 @@ descriptives.marker(ge03d2, ids=control_ids)
 ```
 
 
-## Quality contron of genotype data
+## Quality control of genotype data
 
 Now let's summarize our observations and perform quality control for genotype data.
 
@@ -223,12 +223,12 @@ Basic QC consists of following steps:
     2. Y-Heterozygose females
   
   2. Identification of individuals with elevated missing data rates or outlying heterozygosity rate
-    1. IDs with low call rate (<97%, 98% or 99%)
-    2. IDs with ourlying heterozygosity rate
+    1. IDs with low call rate (<95%, 97% or 99%)
+    2. IDs with outlying heterozygosity rate
       1. Too high - DNA sample contamination 
       2. Too low - inbreeding
   
-  3. Identification of duplicated or related individuals
+  3. Identification of duplicated or related individuals (if these individuals need to be removed)
     1. Estimation of kinship matrix
     2. IBS=0.5 -> monozygos twins or duplicated samples
     3. IBS > 0.125 -> close relatives
@@ -278,9 +278,9 @@ ge03d2clean <- ge03d2[qc2$idok,qc2$snpok]
 
 Now, we are ready for the second round of QC – detection of genetic outliers
 which may contaminate our results. We will detect genetic outliers using a
-technique, which resembles the one suggested by Price at al.
+technique suggested by Price at al.
 As the first step, we will compute a matrix of genomic kinship between all
-pairs of individuals, using only autosomal 2 markers by
+pairs of individuals, using autosomal markers:
 
 ```{r}
 gkin <- ibs(ge03d2clean[, autosomal(ge03d2clean)], weight="freq")
@@ -289,7 +289,7 @@ gkin[1:5, 1:5]
 ```
 
 The numbers below the diagonal show the genomic estimate of kinship (aka
-’genomic kinship’ or ’genome-wide IBD’), the numbers on the diagonal corre-
+’genomic kinship’ or ’genome-wide IBS’), the numbers on the diagonal corre-
 spond to 0.5 plus the genomic homozigosity, and the numbers above the diagonal
 tell how many SNPs were typed successfully for both subjects (thus the IBD
 estimate is derived using this number of SNPs).
@@ -310,10 +310,10 @@ We can present the results graphically by
 plot(data.mds)
 ```
 
-The resulting plot is shown in figure. Each point on the plot corresponds
-to a person, and the 2D distances between points were fitted to be as close as
-possible to those presented in the original IBS matrix. You can see that study
-subjects clearly cluster in two groups. Let's get id names of samples from the second cluster and removed them from the data and re-run QC
+Each point on the plot corresponds to a person, and the 2D distances between 
+points are fitted to be as close as possible to those presented in the original distance matrix.
+You can see that study participants clearly cluster in two groups. 
+Let's get id names of samples from the second cluster and removed them from the data and re-run QC
 
 ```{r}
 
