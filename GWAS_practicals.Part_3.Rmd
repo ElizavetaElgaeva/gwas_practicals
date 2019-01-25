@@ -17,7 +17,7 @@ The practical session consists of three steps:
 
  1. Exploring phenotype data
  2. Exploring genotype data and quality control
- 4. Association analysis and GWAS
+ 3. Association analysis and GWAS
 
 ## Loading QCed ge03d2clean data
 
@@ -27,7 +27,7 @@ Load GenABEL package
 library(GenABEL)
 ```
 
-Load phenotype and genotype data
+Load clean phenotype and genotype data
 
 ```{r}
 
@@ -36,7 +36,7 @@ load('data/ge02d2clean.RData')
 
 ```
 
-Let's check number of IDs and SNPs
+Let's check the number of IDs and SNPs
 
 ```{r}
 nids(ge03d2clean)
@@ -47,7 +47,7 @@ nsnps(ge03d2clean)
 ## Single SNP association analysis
 
 Let's run association analysis for a single SNP.
-For this we will store genotypes for this SNP in separate object.
+For this we will store genotypes for this SNP in a separate object.
 
 ```{r}
 
@@ -75,18 +75,18 @@ log_reg_snp <- glm(phdata(ge03d2clean)$dm2~my_snp_num)
 summary(log_reg_snp)
 ```
 
-As we can see, there is no association at all.
-Let's check the distribution of cases and controls across genotypes.
+As we can see, there is no association (p-value>0.05).
+Let's check the distribution of cases and controls across the genotypes.
 
 ```{r}
 table(phdata(ge03d2clean)$dm2,my_snp_cha)
 ```
 
-Indeed, the distribution of cases and controls across genotypes is random.
+Indeed, the distribution of cases and controls across the genotypes is random.
 
 ## Genome-wide association scan
 
-Now let's run tiny GWAS :). We will use qtscore function of GenABEL package.
+Now let's run your first small GWAS :). We will use 'mlreg' function of GenABEL package.
 Basically, we will run 7000 regressions. We will run GWAS for dm2 with age and sex as covariates
 
 ```{r}
@@ -122,7 +122,7 @@ plot(qt_sex_age_bmi,df = 1)
 
 ## Regional assoc plot
 
-Now let's zoom Manhattan plot around found signal. This plot is called regional association plot
+Now let's zoom Manhattan plot around found signal. This plot is called regional association plot.
 ```{r}
 gwas_sum <- summary(qt_sex_age_bmi)
 
@@ -134,7 +134,7 @@ plot(-log10(gwas_sum_sm$P1df)~gwas_sum_sm$Position)
 
 ## Table of genotypes and c/c status for the best SNP
 
-Now let's have a look at the distribution of cases and controls across genotypes of the
+Now let's have a look at the distribution of cases and controls across the genotypes of the
 top associated SNP.
 
 ```{r}
@@ -177,4 +177,5 @@ write.table(sum_stats2write,file='results/sum_stats.tsv', sep='\t', quote = FALS
 Aulchenko, Yurii S., Karssen, Lennart C., & The GenABEL project developers. (2015). The GenABEL Tutorial. Zenodo. http://doi.org/10.5281/zenodo.19738
 
 Anderson, C. A., Pettersson, F. H., Clarke, G. M., Cardon, L. R., Morris, A. P., & Zondervan, K. T. (2010). Data quality control in genetic case-control association studies. Nature Protocols, 5(9), 1564–73. http://doi.org/10.1038/nprot.2010.116
+
 ## Saving data
