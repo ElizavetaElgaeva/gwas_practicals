@@ -8,6 +8,8 @@ Authors:
 	2. Yurii Aulchenko <y.s.aulchenko@polyomica.com>
 	3. GenABEL developers <genabel.org>
 
+Some minor corrections and updates were made by Yakov Tsepilov.
+
 # Outline of the practicals
 
 The practical session consists of three steps:
