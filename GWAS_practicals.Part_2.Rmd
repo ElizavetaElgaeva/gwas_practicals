@@ -17,7 +17,7 @@ The practical session consists of three steps:
 
  1. Exploring phenotype data
  2. Exploring genotype data and quality control
- 4. Association analysis and GWAS
+ 3. Association analysis and GWAS
 
 ## Loading genotype data
 
@@ -36,7 +36,7 @@ data("ge03d2")
 
 ```
 
-Let's get the Structure of ge03d2 object
+Let's discover the structure of ge03d2 object
 
 ```{r}
 str(ge03d2)
@@ -60,15 +60,14 @@ as.numeric(gtdata(ge03d2[1:5,1:5]))
 as.character(gtdata(ge03d2[1:5,1:5]))
 ```
 
-The number of individuals described in an object of gwaa.data-class can
-be accessed through nids function and the number of SNPs using the nsnps function:
+The number of individuals can be obtained by "nids" function; and the number of SNPs - by "nsnps" function:
 
 ```{r}
 nids(ge03d2)
 nsnps(ge03d2)
 ```
 
-What information about SNPs do we have?
+Which SNP information do we have?
 
 ```{r}
 snp_info <- summary(gtdata(ge03d2))
@@ -78,9 +77,9 @@ head(snp_info)
 
 Description of columns:
   
-  1. ...
-  2. ...
-  3. ...
+  1. Q.2 - frequency of allele 2 (A2)
+  2. Pexact - p-value of HWE test
+  3. P.11, P.12, P.22 - number of genotypes
 
 What is the distribution of number of SNPs per chromosome?
 
@@ -106,7 +105,7 @@ table(as.character(gtdata(ge03d2[,'rs6212914'])))
 
 ```
 
-Let's estiamte effective allele frequency for this SNP using different ways
+Let's estiamte effective allele frequency for this SNP by different ways
 
 ```{r}
 
@@ -125,7 +124,7 @@ HWE.show(ge03d2[,'rs6212914'])
 
 Let's have a look at the summary of the genotype data.
 
-First, let's add EAF (effective allele frequency) column to the *snp_info* object
+First, let's add EAF (effective allele frequency) column to the *snp_info* object. Note, that EAF is also presented in 'Q.2' column, but we will calculate it by ourself.
 
 ```{r}
 
@@ -135,7 +134,7 @@ head(snp_info)
 
 ```
 
-Let's look at the distribution of EAF - effective allele frequency.
+Let's have a look at the distribution of EAF.
 
 ```{r}
 hist(snp_info$EAF, breaks=50)
