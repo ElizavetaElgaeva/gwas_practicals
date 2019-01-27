@@ -2,9 +2,7 @@
 title: "Practicals GWAS. Exploring phenotype data."
 author: "Sodbo Sharapov"
 date: "January 22, 2019"
-output:
-  html_document: 
-    keep_md: true
+output: html_document
 ---
 
 ```{r setup, include=FALSE}
