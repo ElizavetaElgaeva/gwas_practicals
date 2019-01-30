@@ -332,7 +332,7 @@ ge03d2clean <- ge03d2[qc3$idok,qc3$snpok]
 Finally, let's save the data for GWAS
 
 ```{r}
-save(ge03d2clean, file='/home/sodbo/work/2019WinterSchool/gwas_practicals/data/ge03d2clean.RData')
+save(ge03d2clean, file='/home/sodbo/work/2019_winter_school/src/data/ge03d2clean.RData')
 ```
 ## Additional literature: 
 

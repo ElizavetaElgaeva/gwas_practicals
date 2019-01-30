@@ -29,7 +29,7 @@ Load clean phenotype and genotype data
 
 ```{r}
 
-load('/home/sodbo/work/2019WinterSchool/gwas_practicals/data/ge03d2clean.RData')
+load('/home/sodbo/work/2019_winter_school/src/data/ge03d2clean.RData')
 
 
 ```
@@ -168,7 +168,7 @@ sum_stats2write <- cbind(sum_stats2write[,c(1:7)],snp_info$Q.2,sum_stats2write[,
 
 colnames(sum_stats2write) <- c('rsid','snpid','chr','pos','a1','a0','n','freq1','beta1','se','p','strand')
 
-write.table(sum_stats2write,file='/home/sodbo/work/2019WinterSchool/gwas_practicals/results/sum_stats.tsv', sep='\t', quote = FALSE,row.names = FALSE)
+write.table(sum_stats2write,file='/home/sodbo/work/2019_winter_school/src/results/sum_stats.tsv', sep='\t', quote = FALSE,row.names = FALSE)
 ```
 ## Additional literature: 
 
