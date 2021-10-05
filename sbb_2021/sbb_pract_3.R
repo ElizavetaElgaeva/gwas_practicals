@@ -100,7 +100,7 @@ sum_stats2write <- cbind(sum_stats2write[,c(1:7)],snp_info$Q.2,sum_stats2write[,
 colnames(sum_stats2write) <- c('rsid','snpid','chr','pos','a1','a0','n','freq1','beta1','se','p','strand')
 write.table(sum_stats2write,file='.../sum_stats.tsv', sep='\t', quote = FALSE, row.names = FALSE)
 
-## Additional literature: 
+## Литература: 
 
 # Aulchenko, Yurii S., Karssen, Lennart C., & The GenABEL project developers. (2015). The GenABEL Tutorial. Zenodo. http://doi.org/10.5281/zenodo.19738
 
