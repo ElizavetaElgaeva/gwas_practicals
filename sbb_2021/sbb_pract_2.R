@@ -1,13 +1,6 @@
----
-title: "Практикум по Компьютерной статистической геномике. Часть 2: Работа с данными генотипов, контроль качества."
-author: "Содбо Шарапов, Елгаева Елизавета"
-date: "6 октября 2021 г."
-output: html_document
----
-  
-```{r setup, include=FALSE}
-knitr::opts_chunk$set(echo = TRUE)
-```
+#title: "Практикум по Компьютерной статистической геномике. Часть 2: Работа с данными генотипов, контроль качества."
+#author: "Содбо Шарапов, Елгаева Елизавета"
+#date: "6 октября 2021 г."
 
 # План практикума
 
@@ -19,29 +12,21 @@ knitr::opts_chunk$set(echo = TRUE)
 
 ## Загрузка программных пакетов
 
-```{r}
 library(GenABEL)
 library(GenABEL.data)
-```
 
 ## Загрузка тестового набора данных
 
-```{r}
 data("ge03d2")
-```
 
 # Общая структура данных
 
-```{r}
 str(ge03d2)
 gtdata(ge03d2) #  то же самое, что и summary(ge03d2@gtdata)
 ge03d2@gtdata@chromosome
 
-```
-
 # Работа с генотипами
 
-```{r}
 nids(ge03d2)
 nsnps(ge03d2)
 chromosome(ge03d2)
@@ -50,14 +35,11 @@ as.character(gtdata(ge03d2[1:5, 1:5]))
 as.numeric(gtdata(ge03d2[1:5, 1:5]))
 effallele(ge03d2@gtdata)
 refallele(ge03d2@gtdata)
-```
 
 ## Информация по SNP
   
-```{r}
 snp_info <- summary(gtdata(ge03d2))
 head(snp_info)
-```
 
 ## Описание колонок:
   
@@ -67,80 +49,61 @@ head(snp_info)
 
 ## Распределение количества SNP по хромосомам
   
-```{r}
 table(chromosome(ge03d2))
-```
 
 ## Информация по отдельным SNP
 
-```{r}
 snp_info['rs6212914',]
-```
 
 ## Распределение генотипов для отдельного SNP
 
-```{r}
 table(as.character(gtdata(ge03d2[,'rs6212914'])))
-```
+
 
 ## Оценка частоты эффекторного аллеля
 
-```{r}
 (snp_info['rs6212914','P.12'] + snp_info['rs6212914','P.22'] * 2) / snp_info['rs6212914','NoMeasured'] / 2
 mean(as.numeric(gtdata(ge03d2[,'rs6212914'])), na.rm=TRUE) / 2
-```
+
 ## Проверка на равновесие Харди-Вайнберга (HWE test)
 
-```{r}
 HWE.show(ge03d2[,'rs6212914'])
-```
 
 ## Статистика по отдельному SNP
 
 # Сперва добавим колонку EAF (effective allele frequency). Та же информация есть в 'Q.2',
 # но мы попробуем посчитать ее самостоятельно
 
-```{r}
 snp_info$EAF <- (snp_info[,'P.12'] + snp_info[,'P.22'] * 2) / snp_info[,'NoMeasured'] / 2
 head(snp_info)
-```
 
 # Распределение EAF
 
-```{r}
 hist(snp_info$EAF, breaks=50)
-```
 
 # Множество SNP c EAF меньше 0.05
 
 # Проверим процент генотипирования по образцам (call rate)
   
-```{r}
 hist(snp_info$CallRate, breaks=50)
-```
 
 # Проведем HWE test
   
-```{r}
 catable(snp_info$Pexact, c(0.05/nsnps(ge03d2), 0.01, 0.05, 0.1), cum=TRUE)
-```
 
 # Отдельно для контрольной выборки
   
-```{r}
 control_ids <- idnames(ge03d2)[phdata(ge03d2)$dm2==0]
 catable(summary(gtdata(ge03d2[control_ids,]))$Pexact, c(0.05/nsnps(ge03d2), 0.01, 0.05, 0.1), cum=TRUE)
-```
+
 # В контрольной выборке меньше SNP отклоняются от равновесия
 
 
 ## Теперь посмотрим, как проверить статистику по обазцу
 
 # Статистика по ID
-```{r}
 idsummary <- perid.summary(ge03d2)
 head(idsummary)
-```
 
 # Описание колонок:
   
@@ -150,22 +113,16 @@ head(idsummary)
 
 # Проверим процент генотипирования по SNP
 
-```{r}
 hist(idsummary$CallPP, breaks=100)
-```
 
 # Проверим гетерозиготность (heterozigosity rate)
 
-```{r}
 hist(idsummary$Het, breaks=100)
-```
 
 # Несколько образцов с высокой гетерозиготностью, что говорит о возможной контаминации образцов
 
-```{r}
 descriptives.marker(ge03d2)
 descriptives.marker(ge03d2, ids=control_ids)
-```
 
 ## Контроль качества данных генотипирования
 
@@ -205,13 +162,10 @@ descriptives.marker(ge03d2, ids=control_ids)
 
 # Начнем QC c функцией **check.marker**
 
-```{r}
 qc1 <- check.marker(ge03d2, p.level = 0, maf = 0.01, perid.call = 0.97, callrate = 0.97)
-```
 
 # Определим ID, которые будут проверены на HWE
 
-```{r}
 hweids <- intersect(control_ids, qc1$idok)
 qc2 <- check.marker(ge03d2, 
 p.level = 1e-6, 
@@ -219,23 +173,18 @@ maf = 0.01,
 perid.call = 0.97, 
 callrate = 0.97,
 hweidsubset = hweids)
-```
 
 # QC окончен, сохраним результат
 
-```{r}
 ge03d2clean <- ge03d2[qc2$idok,qc2$snpok]
-```
 
 ## Проверим данные на стартификациюe
 
 # Используем алгоритм, предложенный Price at al.
 # Сначала вычислим матрицу родства по аутосомным маркерам:
   
-```{r}
 gkin <- ibs(ge03d2clean[, autosomal(ge03d2clean)], weight="freq")
 gkin[1:5, 1:5]
-```
 
 # Числа под диагональю отражают оценки геномного родства
 # (’genomic kinship’ или ’genome-wide IBS’), сисла по диагонали соответствуют
@@ -244,28 +193,21 @@ gkin[1:5, 1:5]
 
 # Переведем матрицу в матрицу расстояний
 
-```{r}
 data.dist <- as.dist(0.5 - gkin)
-```
 
 # Многомерное шкалирование коэффициентов (Classical Multidimensional Scaling)
 
-```{r}
 data.mds <- cmdscale(data.dist)
-```
 
 # Визуализация результата
 
-```{r}
 plot(data.mds)
-```
 
 # Каждая точка на графике - это отдельный индивид, 2D расстояние между ними 
 # подстроено так, чтобы быть максимально близким к расстоянию из исходной матрицы расстояний
 # Данные явно кластеризуются в две группы 
 # Получим id образцов из второго кластера и исключим их, затем повторим QC
 
-```{r}
 clean_ids <- rownames(data.mds)[data.mds[,1]<0.1]
 controls_clean <- intersect(clean_ids,idnames(ge03d2clean)[phdata(ge03d2clean)$dm2==0])
 qc3 <- check.marker(ge03d2[clean_ids,], 
@@ -275,13 +217,12 @@ perid.call = 0.97,
 callrate = 0.97,
 hweidsubset = controls_clean)
 ge03d2clean <- ge03d2[qc3$idok,qc3$snpok]
-```
+
 
 ## Сохраним данные для GWAS
 
-```{r}
 save(ge03d2clean, file='.../ge03d2clean.RData')
-```
+
 ## Литература: 
 
 # Aulchenko, Yurii S., Karssen, Lennart C., & The GenABEL project developers. (2015). The GenABEL Tutorial. Zenodo. http://doi.org/10.5281/zenodo.19738
